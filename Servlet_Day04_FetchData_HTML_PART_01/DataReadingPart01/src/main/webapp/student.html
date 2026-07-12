@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>this is the student form</h1>
+<form action="StudentRegistration" method="post">
+<label>Student Name</label>
+<input type="text" name="studentName"><br>
+
+<label>Student Phone No</label>
+<input type="tel" maxlength="10" pattern="[0-9]{10}" name="studentPh"><br>
+
+<label>Student Email</label>
+<input type="text" name="studentMail"><br>
+
+<label>Student Gender</label>
+Male: <input type="radio" name="studentGender" value="Male">
+Female: <input type="radio" name="studentGender" value="Female">
+<br/>
+<label>Course</label>
+<select name="studentCourse">
+   <option value="Core Java">Core Java</option>
+   <option value="Advance Java">Advance Java</option>
+   <option value="Core Python">Core Python</option>
+   <option value="Advance  Python">Advance  Python</option>
+   <option value="Java Full Stack">Java Full Stack</option>
+</select>
+
+</br>
+<label>Elective Subject</label></br>
+
+<label>Machine Learning</label>
+<input type="checkbox" name="ElectiveSubject" value="Machine Learning"></br>
+
+<label>Deep Learning</label>
+<input type="checkbox" name="ElectiveSubject" value="DeepLearning"></br>
+
+<label>Generative Ai</label>
+<input type="checkbox" name="ElectiveSubject" value="Generative Ai"></br>
+
+<br/>
+<button type="submit">Submit</button>
+
+
+
+</form>
+
+</body>
+</html>

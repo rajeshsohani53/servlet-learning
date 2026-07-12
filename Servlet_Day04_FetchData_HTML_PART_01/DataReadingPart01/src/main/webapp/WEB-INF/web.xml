@@ -5,14 +5,7 @@
 
   <display-name>DataReadingPart01</display-name>
 
-  <servlet>
-    <servlet-name>Demo</servlet-name>
-    <servlet-class>com.rajesh.Demo</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Demo</servlet-name>
-    <url-pattern>/Demo</url-pattern>
-  </servlet-mapping>
+
 
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
