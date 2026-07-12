@@ -1,0 +1,447 @@
+================================================================================
+        APACHE TOMCAT SERVER CRASH - PROBLEMS & SOLUTIONS
+        Project: DataReadingPart01 | Servlet Learning Day 04
+================================================================================
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 1 — DUPLICATE SERVLET REGISTRATION (The crash that happened to us)
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENED:
+    The servlet was registered TWICE for the same URL pattern "/Demo":
+      - Once via @WebServlet("/Demo") annotation in Demo.java
+      - Once via <servlet-mapping> for "/Demo" in web.xml
+
+    Tomcat throws a deployment exception and aborts startup.
+
+ERROR YOU SEE IN CONSOLE:
+    java.lang.IllegalArgumentException: Servlet mapping [/Demo] is already registered
+    OR
+    Caused by: java.lang.IllegalStateException: ...duplicate mapping
+
+WHY IT HAPPENS:
+    @WebServlet and web.xml servlet-mapping do the exact same job.
+    Using both is like assigning two people to the same seat — Tomcat refuses to start.
+
+SOLUTION:
+    Use ONLY ONE registration method. Never use both at the same time.
+
+    Option A — Use @WebServlet annotation only (remove from web.xml):
+    ---------------------------------------------------------------
+    In Demo.java:
+        @WebServlet("/Demo")
+        public class Demo extends HttpServlet { ... }
+
+    In web.xml:
+        Do NOT add <servlet> or <servlet-mapping> for Demo.
+        Only keep <welcome-file-list> and <display-name>.
+
+    Option B — Use web.xml only (remove annotation from Java class):
+    ---------------------------------------------------------------
+    In Demo.java:
+        public class Demo extends HttpServlet { ... }   // no @WebServlet
+
+    In web.xml:
+        <servlet>
+            <servlet-name>Demo</servlet-name>
+            <servlet-class>com.rajesh.Demo</servlet-class>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>Demo</servlet-name>
+            <url-pattern>/Demo</url-pattern>
+        </servlet-mapping>
+
+    RECOMMENDED FOR ECLIPSE USERS: Use Option B (web.xml)
+    Eclipse reads web.xml to find the URL and opens the correct browser tab.
+    With annotation only, Eclipse falls back to the broken legacy URL:
+        http://localhost:8080/DataReadingPart01/servlet/com.rajesh.Demo
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 2 — OLD web.xml DTD (Servlet 2.3) WITH MODERN JAKARTA CODE
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENED:
+    web.xml used the ancient Servlet 2.3 DTD:
+        <!DOCTYPE web-app PUBLIC
+          "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+          "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+    But the code uses jakarta.servlet-api 6.1.0 (Jakarta EE / Tomcat 11).
+    Servlet 2.3 DTD is from year 2001 — it does not support annotations,
+    it does not support the jakarta.* namespace, and causes XML validation errors.
+
+ERROR YOU SEE IN CONSOLE:
+    Deployment descriptor ... specifies Servlet 2.3
+    OR unexpected parsing errors when Tomcat reads web.xml
+
+SOLUTION:
+    Update web.xml to use the correct Jakarta EE namespace matching your API version.
+
+    For jakarta.servlet-api 5.x (Tomcat 10.x):
+        <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                     https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+                 version="5.0">
+
+    For jakarta.servlet-api 6.0 or 6.1 (Tomcat 11.x):
+        <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                     https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+                 version="6.0">
+
+    NEVER use the old DTD format when working with Jakarta EE projects.
+
+    Quick Version Reference:
+    ┌─────────────────────────────┬──────────────┬───────────────┐
+    │ Dependency                  │ Tomcat       │ web.xml ver   │
+    ├─────────────────────────────┼──────────────┼───────────────┤
+    │ javax.servlet-api 4.x       │ Tomcat 9.x   │ 4.0           │
+    │ jakarta.servlet-api 5.x     │ Tomcat 10.x  │ 5.0           │
+    │ jakarta.servlet-api 6.0/6.1 │ Tomcat 11.x  │ 6.0           │
+    └─────────────────────────────┴──────────────┴───────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 3 — WRONG WELCOME FILE IN web.xml
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENED:
+    web.xml listed index.html as the welcome file:
+        <welcome-file>index.html</welcome-file>
+
+    But the project only has index.jsp — so the home page returns 404.
+
+SOLUTION:
+    Always match the welcome-file to the actual file that exists in webapp/:
+
+        <welcome-file-list>
+            <welcome-file>index.jsp</welcome-file>
+        </welcome-file-list>
+
+    You can list multiple fallbacks — Tomcat tries them in order:
+        <welcome-file-list>
+            <welcome-file>index.html</welcome-file>
+            <welcome-file>index.jsp</welcome-file>
+            <welcome-file>index.htm</welcome-file>
+        </welcome-file-list>
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 4 — WRONG javax vs jakarta IMPORT IN SERVLET CLASS
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENS:
+    If you use javax.servlet.* imports but your pom.xml has jakarta.servlet-api,
+    the class will fail to compile or Tomcat will throw ClassNotFoundException.
+
+ERROR YOU SEE:
+    ClassNotFoundException: com.rajesh.Demo
+    OR compilation error: package javax.servlet does not exist
+
+WRONG (for Tomcat 10+ / Jakarta EE):
+    import javax.servlet.http.HttpServlet;       // OLD namespace
+    import javax.servlet.http.HttpServletRequest;
+
+CORRECT (for Tomcat 10+ / Jakarta EE):
+    import jakarta.servlet.http.HttpServlet;     // NEW namespace
+    import jakarta.servlet.http.HttpServletRequest;
+
+RULE:
+    Tomcat 9 and below  → use javax.servlet.*
+    Tomcat 10 and above → use jakarta.servlet.*
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 5 — PORT 8080 ALREADY IN USE
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENS:
+    Another process (a previous Tomcat, another server, or any app) is already
+    using port 8080. Tomcat cannot bind to that port and fails to start.
+
+ERROR YOU SEE IN CONSOLE:
+    java.net.BindException: Address already in use: bind
+    OR
+    Caused by: java.net.BindException: Address already in use (Bind failed)
+
+HOW TO FIX ON LINUX:
+    Step 1 — Find what is using port 8080:
+        sudo lsof -i :8080
+        OR
+        sudo netstat -tulnp | grep 8080
+
+    Step 2 — Kill that process (replace PID with the number from Step 1):
+        kill -9 <PID>
+
+    Step 3 — Restart Tomcat.
+
+ALTERNATIVE FIX — Change Tomcat port:
+    Open: <TOMCAT_HOME>/conf/server.xml
+    Find:  <Connector port="8080" .../>
+    Change to any free port, e.g.:
+           <Connector port="8090" .../>
+    Then access: http://localhost:8090/DataReadingPart01/Demo
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 6 — JAVA VERSION MISMATCH
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENS:
+    The project is compiled with a newer Java version than Tomcat's JVM,
+    or Tomcat is running on a JDK version too old for the project.
+
+ERROR YOU SEE:
+    UnsupportedClassVersionError: com/rajesh/Demo
+    has been compiled by a more recent version of the Java Runtime
+
+SOLUTION:
+    Match the Java version in pom.xml with the JDK Tomcat is running on.
+    Add this inside <build> in pom.xml:
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    Tomcat 10+ requires Java 11 minimum. Tomcat 11 recommends Java 17+.
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 7 — MISSING OR WRONG pom.xml DEPENDENCY SCOPE
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENS:
+    If jakarta.servlet-api scope is NOT set to "provided", Maven includes the
+    jar inside the WAR file. This conflicts with Tomcat's own servlet jar,
+    causing ClassCastException or server errors.
+
+WRONG:
+    <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>6.1.0</version>
+        <!-- no scope = "compile" scope = JAR bundled into WAR = CONFLICT -->
+    </dependency>
+
+CORRECT:
+    <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>6.1.0</version>
+        <scope>provided</scope>   <!-- Tomcat provides this jar at runtime -->
+    </dependency>
+
+RULE: servlet-api dependency scope must ALWAYS be "provided".
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROBLEM 8 — ECLIPSE OPENS WRONG URL (servlet/com.rajesh.Demo)
+════════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENED:
+    After running the project on server, Eclipse opened the browser at:
+        http://localhost:8080/DataReadingPart01/servlet/com.rajesh.Demo
+
+    This page gives a 404 error — the URL does not exist on modern Tomcat.
+
+WHY IT HAPPENS:
+    Eclipse determines the launch URL by reading the <servlet-mapping> from web.xml.
+    When there is NO mapping in web.xml (only a @WebServlet annotation),
+    Eclipse cannot find the URL, so it falls back to a very old legacy pattern:
+
+        /servlet/<fully-qualified-class-name>
+
+    This "invoker servlet" pattern was used in Tomcat 4.x era (year 2001).
+    Modern Tomcat (9, 10, 11) does NOT support this URL — it returns 404.
+
+THE CORRECT URL FOR THIS PROJECT:
+        http://localhost:8080/DataReadingPart01/Demo
+
+HOW TO FIX — 3 OPTIONS:
+
+    Option 1 — Use web.xml servlet mapping (RECOMMENDED for Eclipse):
+    ---------------------------------------------------------------
+    Remove @WebServlet from Demo.java and add the mapping in web.xml:
+
+        <servlet>
+            <servlet-name>Demo</servlet-name>
+            <servlet-class>com.rajesh.Demo</servlet-class>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>Demo</servlet-name>
+            <url-pattern>/Demo</url-pattern>
+        </servlet-mapping>
+
+    Eclipse reads this and automatically opens the correct URL.
+
+    Option 2 — Navigate manually in the browser:
+    ---------------------------------------------------------------
+    If you want to keep using @WebServlet annotation, just ignore the
+    wrong URL Eclipse opens and manually type the correct one:
+        http://localhost:8080/DataReadingPart01/Demo
+
+    Option 3 — Fix the Eclipse Run Configuration:
+    ---------------------------------------------------------------
+    Step 1: Click the dropdown arrow next to the Run button in Eclipse
+    Step 2: Select "Run Configurations..."
+    Step 3: Find your server config under "Apache Tomcat"
+    Step 4: Go to the "Web Browser" or launch tab
+    Step 5: Change the startup URL to:
+                http://localhost:8080/DataReadingPart01/Demo
+    Step 6: Click Apply → Run
+
+SUMMARY TABLE:
+    ┌──────────────────────────┬────────────────────────────────────────────────┐
+    │ Registration Method      │ Eclipse Launch URL Behaviour                   │
+    ├──────────────────────────┼────────────────────────────────────────────────┤
+    │ @WebServlet only         │ Falls back to /servlet/classname (404 error)   │
+    │ web.xml mapping only     │ Reads URL from web.xml (correct URL opens)     │
+    │ Both (annotation+web.xml)│ Server crash on startup (duplicate mapping)    │
+    └──────────────────────────┴────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUICK DIAGNOSTIC CHECKLIST — BEFORE RUNNING ON SERVER
+════════════════════════════════════════════════════════════════════════════════
+
+  [ ] Is servlet registered in ONLY ONE place? (annotation OR web.xml, not both)
+  [ ] Does web.xml use the correct Jakarta EE namespace for your Tomcat version?
+  [ ] Do Java imports use jakarta.servlet.* (not javax.servlet.*)?
+  [ ] Does the welcome-file in web.xml match an actual file in webapp/?
+  [ ] Is jakarta.servlet-api scope set to "provided" in pom.xml?
+  [ ] Is port 8080 free? (no other server running)
+  [ ] Is the Java version compatible with your Tomcat version?
+  [ ] Does the project build without errors? (Maven → Update Project first)
+  [ ] Is the browser opening the correct URL? (not the /servlet/classname pattern)
+
+If all checks pass → right-click project → Run As → Run on Server → it works.
+
+
+════════════════════════════════════════════════════════════════════════════════
+CORRECT FINAL STATE OF THIS PROJECT (DataReadingPart01)
+════════════════════════════════════════════════════════════════════════════════
+
+Demo.java:
+    - NO @WebServlet annotation
+    - imports jakarta.servlet.*
+    - extends HttpServlet, overrides doGet / doPost
+
+web.xml:
+    - Jakarta EE 6.0 namespace (version="6.0")
+    - <servlet> + <servlet-mapping> for Demo → /Demo
+    - <welcome-file>index.jsp</welcome-file>
+
+pom.xml:
+    - jakarta.servlet-api 6.1.0 with scope=provided
+
+Access URL after running on server:
+    http://localhost:8080/DataReadingPart01/Demo
+
+
+════════════════════════════════════════════════════════════════════════════════
+SESSION SUMMARY — WHAT HAPPENED & WHAT WE DID (July 12, 2026)
+════════════════════════════════════════════════════════════════════════════════
+
+PROJECT: DataReadingPart01 (Servlet Day 04 - FetchData HTML Part 01)
+ISSUE:   Apache Tomcat failed to start when running the project on server
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 1 — SERVER CRASH ON STARTUP
+────────────────────────────────────────────────────────────────────────────────
+
+PROBLEM FOUND:
+    Demo.java had @WebServlet("/Demo") annotation AND web.xml also had a
+    <servlet-mapping> for the same URL pattern /Demo.
+    This is a duplicate registration — Tomcat crashes on startup.
+
+    Additionally, web.xml was using the ancient Servlet 2.3 DTD which is
+    incompatible with jakarta.servlet-api 6.1.0 used in pom.xml.
+
+    Also, web.xml had index.html as welcome file but only index.jsp existed.
+
+FIX APPLIED:
+    1. Replaced the old Servlet 2.3 DTD with Jakarta EE 6.0 XML namespace.
+    2. Removed <servlet> and <servlet-mapping> blocks from web.xml.
+       (keeping @WebServlet annotation as the only registration method)
+    3. Changed welcome-file from index.html to index.jsp.
+
+    web.xml after fix:
+        <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" version="6.0">
+            <display-name>DataReadingPart01</display-name>
+            <welcome-file-list>
+                <welcome-file>index.jsp</welcome-file>
+            </welcome-file-list>
+        </web-app>
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 2 — ECLIPSE OPENED WRONG URL AFTER FIXING THE CRASH
+────────────────────────────────────────────────────────────────────────────────
+
+PROBLEM FOUND:
+    After fixing the crash, Eclipse opened the browser at:
+        http://localhost:8080/DataReadingPart01/servlet/com.rajesh.Demo
+
+    This gave a 404 error. Eclipse used a legacy invoker URL pattern because
+    it could not find any servlet mapping in web.xml (we had removed it in Step 1).
+
+FIX APPLIED:
+    Switched from annotation-based to web.xml-based servlet registration:
+    1. Removed @WebServlet("/Demo") annotation from Demo.java.
+    2. Removed the unused "import jakarta.servlet.annotation.WebServlet" import.
+    3. Added <servlet> and <servlet-mapping> back into web.xml.
+
+    Demo.java after fix (no annotation):
+        public class Demo extends HttpServlet { ... }
+
+    web.xml after fix (mapping added back):
+        <servlet>
+            <servlet-name>Demo</servlet-name>
+            <servlet-class>com.rajesh.Demo</servlet-class>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>Demo</servlet-name>
+            <url-pattern>/Demo</url-pattern>
+        </servlet-mapping>
+
+    Eclipse now reads the mapping from web.xml and opens the correct URL:
+        http://localhost:8080/DataReadingPart01/Demo
+
+────────────────────────────────────────────────────────────────────────────────
+ROOT CAUSE EXPLAINED
+────────────────────────────────────────────────────────────────────────────────
+
+    The Maven archetype (template) that created this project generated:
+      - An old Servlet 2.3 web.xml
+      - A default servlet registration in web.xml
+
+    Then when writing the Demo servlet, @WebServlet annotation was also added.
+    This created 3 problems at once:
+      1. Old web.xml DTD incompatible with Jakarta EE
+      2. Duplicate servlet registration (annotation + web.xml)
+      3. Wrong welcome file
+
+    LESSON: Always check what the Maven archetype generates in web.xml before
+    adding @WebServlet annotations. Use ONE registration method only.
+
+────────────────────────────────────────────────────────────────────────────────
+FINAL WORKING STATE OF THE PROJECT
+────────────────────────────────────────────────────────────────────────────────
+
+    Demo.java     → No @WebServlet, only jakarta.servlet.* imports
+    web.xml       → Jakarta EE 6.0 namespace, servlet mapping for /Demo
+    pom.xml       → jakarta.servlet-api 6.1.0 with scope=provided
+    Correct URL   → http://localhost:8080/DataReadingPart01/Demo
+
+================================================================================
