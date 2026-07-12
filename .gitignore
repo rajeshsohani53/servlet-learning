@@ -1,0 +1,63 @@
+# ========================================
+# Eclipse workspace-level (machine-specific)
+# ========================================
+.metadata/
+Servers/
+RemoteSystemsTempFiles/
+
+# ========================================
+# Eclipse per-project files
+# Reason: Maven's pom.xml is the source of truth.
+# Eclipse can regenerate these via "Import Existing Maven Project".
+# Keeping them out means your repo works on any IDE (IntelliJ, VS Code).
+# ========================================
+.project
+.classpath
+.settings/
+.factorypath
+.apt_generated/
+
+# ========================================
+# Maven / build output
+# Reason: these are generated. Never commit build artifacts.
+# ========================================
+target/
+build/
+bin/
+*.class
+*.war
+*.jar
+
+# ========================================
+# IntelliJ IDEA (in case you try it later)
+# ========================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ========================================
+# VS Code
+# ========================================
+.vscode/
+
+# ========================================
+# OS junk
+# ========================================
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ========================================
+# Logs & temp files
+# ========================================
+*.log
+logs/
+*.tmp
+
+# ========================================
+# Your throwaway scratch folder (local only)
+# ========================================
+JustDemo/
