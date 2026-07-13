@@ -29,7 +29,7 @@ public class CarServlet extends HttpServlet {
 			response.getWriter().println("Car Data Saved");
 		}else
 		{
-			response.getWriter().println("Car Data Saved");
+			response.getWriter().println("Car Data not Saved");
 		}
 	}
 
