@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Car Registration Form</title>
+</head>
+<body>
+
+    <h2>Car Registration Form</h2>
+
+    <form action="CarServlet" method="post">
+
+        <table>
+            <tr>
+                <td>Car Name</td>
+                <td>
+                    <input type="text" name="carName" required>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Car Number</td>
+                <td>
+                    <input type="text" name="carNumber" required>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Car Model</td>
+                <td>
+                    <input type="text" name="carModel" required>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Car Company</td>
+                <td>
+                    <input type="text" name="carCompany" required>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="submit" value="Register Car">
+                    <input type="reset" value="Clear">
+                </td>
+            </tr>
+        </table>
+
+    </form>
+
+</body>
+</html>
