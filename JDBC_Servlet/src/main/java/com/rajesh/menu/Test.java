@@ -15,6 +15,10 @@ public class Test {
 		 {
 			 System.out.println("not connectedd");
 		 }
+		 Menu data[]=MenuRepo.getdata();
+		 System.out.println(data[0]);
+		 
+		 
 	}
 
 }
