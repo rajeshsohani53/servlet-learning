@@ -8,5 +8,6 @@
 <a href="login.html" target="blank"><button>Login Page</button></a>
 <form action="ServletGetData" method="post">
 <button type="submit"> Get Data</button>
+<button><a href="HotelLogin.html" target="blank">Hotel</a></button>
 </form>
 </html>
