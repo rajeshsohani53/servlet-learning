@@ -3,8 +3,4 @@
  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
  version="6.0">
   <display-name>Archetype Created Web Application</display-name>
-  
-  <welcome-file-list>
-    <welcome-file>welcome.jsp</welcome-file>
-  </welcome-file-list>
 </web-app>

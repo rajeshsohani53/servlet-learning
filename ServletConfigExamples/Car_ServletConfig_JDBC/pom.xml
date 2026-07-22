@@ -2,41 +2,33 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.rajesh</groupId>
-  <artifactId>JDBC_Servlet</artifactId>
+  <artifactId>Car_ServletConfig_JDBC</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  <name>JDBC_Servlet Maven Webapp</name>
+  <name>Car_ServletConfig_JDBC Maven Webapp</name>
   <url>http://maven.apache.org</url>
- <properties>
-    <maven.compiler.source>26</maven.compiler.source>
-    <maven.compiler.target>26</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-</properties>
+   <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
   <dependencies>
-    
-    
-    <dependency>
+  <dependency>
     <groupId>jakarta.servlet</groupId>
     <artifactId>jakarta.servlet-api</artifactId>
-    <version>6.1.0</version>
+    <version>6.0.0</version>
     <scope>provided</scope>
 </dependency>
-    
-    <dependency>
+
+<dependency>
     <groupId>com.mysql</groupId>
     <artifactId>mysql-connector-j</artifactId>
-    <version>9.4.0</version>
+    <version>9.1.0</version>
+    <scope>runtime</scope>
 </dependency>
-    
-    
-    <dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>1.4.14</version>
-</dependency>
-    
+
   </dependencies>
   <build>
-    <finalName>JDBC_Servlet</finalName>
+    <finalName>Car_ServletConfig_JDBC</finalName>
   </build>
 </project>

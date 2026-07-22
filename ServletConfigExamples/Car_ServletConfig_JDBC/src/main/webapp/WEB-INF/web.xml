@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>Car_ServletConfig_JDBC</display-name>
+
+    <!-- Servlet Registration -->
+    <servlet>
+        <servlet-name>CarServlet</servlet-name>
+        <servlet-class>com.rajesh.car.CarServlet</servlet-class>
+
+        <init-param>
+            <param-name>url</param-name>
+            <param-value>jdbc:mysql://localhost:3306/ServletCar</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>username</param-name>
+            <param-value>javauser</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>password</param-name>
+            <param-value>password123</param-value>
+        </init-param>
+    </servlet>
+
+    <!-- Servlet Mapping -->
+    <servlet-mapping>
+        <servlet-name>CarServlet</servlet-name>
+        <url-pattern>/car</url-pattern>
+    </servlet-mapping>
+
+</web-app>

@@ -2,16 +2,23 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Hotel Management - Register</title>
 </head>
 <body>
-  <form action="RegesterServlet" method="post">
-        <label for="usrname">Enter the Userame</label></br>
-  		<input type="text" name="usrname"></br>
-  		
-  		 <label for="password">Enter the Password</label></br>
-  		<input type="text" name="password"></br>
-  		<button type="submit">Register</button>
-  </form>
+<h1>Register</h1>
+<form action="RegisterServlet" method="post">
+  <label for="usrname">Username</label><br>
+  <input type="text" id="usrname" name="usrname" required><br>
+
+  <label for="email">Email</label><br>
+  <input type="email" id="email" name="email" required><br>
+
+  <label for="password">Password</label><br>
+  <input type="password" id="password" name="password" required><br>
+
+  <button type="submit">Register</button>
+</form>
+
+<p><a href="index.jsp">Already have an account? Log in</a></p>
 </body>
 </html>
