@@ -4,7 +4,7 @@
 </head>
 <body>
 <h2>VIP lounge access!</h2>
-<form action="AuthenticationFilter" method="post">
+<form action="login" method="post">
    <label for="username">Enter user name</label></br>
     <input type="text" name="username"><br><br>
     
